@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Mithi 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose: #e8526a;
+    --rose-light: #f7b8c2;
+    --rose-pale: #fff0f2;
+    --cream: #fffaf5;
+    --ink: #2a1a1f;
+    --ink-soft: #7a5560;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── Petal rain ── */
+  .petals {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .petal {
+    position: absolute;
+    top: -60px;
+    opacity: 0;
+    animation: fall linear infinite;
+  }
+  .petal svg { display: block; }
+  @keyframes fall {
+    0%   { transform: translateY(0) rotate(0deg) scale(1);   opacity: 0; }
+    10%  { opacity: 0.7; }
+    90%  { opacity: 0.5; }
+    100% { transform: translateY(110vh) rotate(520deg) scale(0.6); opacity: 0; }
+  }
+
+  /* ── Card wrapper ── */
+  .scene {
+    position: relative;
+    z-index: 1;
+    width: min(480px, 92vw);
+    padding: 20px 0 40px;
+  }
+
+  /* ── Envelope lid ── */
+  .envelope {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+  }
+  .env-body {
+    background: #fff;
+    border-radius: 4px 4px 16px 16px;
+    height: 220px;
+    box-shadow: 0 8px 40px rgba(232,82,106,0.18), 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 28px;
+    border: 1px solid var(--rose-light);
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+  }
+  .env-body:hover { box-shadow: 0 12px 56px rgba(232,82,106,0.28), 0 2px 8px rgba(0,0,0,0.08); }
+  .env-flap {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 120px;
+    clip-path: polygon(0 0, 50% 62%, 100% 0);
+    background: linear-gradient(160deg, var(--rose-light) 0%, #f9d0d8 100%);
+    transform-origin: top center;
+    transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+    z-index: 2;
+    border-radius: 4px 4px 0 0;
+  }
+  .env-left {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 50%; height: 120px;
+    clip-path: polygon(0 100%, 100% 0, 0 0);
+    background: #fde8ec;
+    z-index: 1;
+  }
+  .env-right {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 50%; height: 120px;
+    clip-path: polygon(100% 100%, 0 0, 100% 0);
+    background: #fde8ec;
+    z-index: 1;
+  }
+  .env-hint {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--rose);
+    font-weight: 400;
+    opacity: 0.8;
+    z-index: 3;
+    position: relative;
+    transition: opacity 0.3s;
+  }
+  .envelope.opened .env-flap {
+    transform: rotateX(180deg);
+  }
+
+  /* ── Letter card ── */
+  .letter {
+    background: #fff;
+    border-radius: 0 0 20px 20px;
+    padding: 0 36px 40px;
+    box-shadow: 0 20px 60px rgba(232,82,106,0.14), 0 4px 16px rgba(0,0,0,0.06);
+    border: 1px solid var(--rose-light);
+    border-top: none;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.8s cubic-bezier(0.4,0,0.2,1), opacity 0.5s ease 0.3s, padding 0.5s;
+  }
+  .letter.visible {
+    max-height: 1000px;
+    opacity: 1;
+    padding: 32px 36px 44px;
+  }
+
+  /* Letter inner content */
+  .letter-date {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--ink-soft);
+    text-align: right;
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease 0.7s, transform 0.5s ease 0.7s;
+  }
+  .letter-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 6vw, 36px);
+    color: var(--rose);
+    line-height: 1.2;
+    margin-bottom: 8px;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s ease 0.85s, transform 0.5s ease 0.85s;
+  }
+  .letter-subtitle {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease 0.95s, transform 0.5s ease 0.95s;
+  }
+  .divider {
+    width: 60px;
+    height: 1px;
+    background: var(--rose-light);
+    margin: 0 0 28px;
+    opacity: 0;
+    transition: opacity 0.5s ease 1.05s;
+  }
+  .letter-body {
+    font-size: 15.5px;
+    color: var(--ink);
+    line-height: 1.85;
+    font-weight: 300;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s ease 1.1s, transform 0.6s ease 1.1s;
+  }
+  .letter-body em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--rose);
+    font-weight: 400;
+  }
+  .letter-body p + p { margin-top: 16px; }
+
+  .from-line {
+    margin-top: 32px;
+    text-align: right;
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: var(--ink-soft);
+    opacity: 0;
+    transition: opacity 0.5s ease 1.5s;
+  }
+  .from-line strong {
+    display: block;
+    font-size: 19px;
+    color: var(--rose);
+    margin-top: 4px;
+  }
+
+  /* Show all children once letter is visible */
+  .letter.visible .letter-date,
+  .letter.visible .letter-title,
+  .letter.visible .letter-subtitle,
+  .letter.visible .divider,
+  .letter.visible .letter-body,
+  .letter.visible .from-line,
+  .letter.visible .forgive-wrap {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Forgive button ── */
+  .forgive-wrap {
+    margin-top: 32px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease 1.7s, transform 0.5s ease 1.7s;
+  }
+  .btn-forgive {
+    display: inline-block;
+    padding: 14px 40px;
+    background: var(--rose);
+    color: #fff;
+    border: none;
+    border-radius: 40px;
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+    box-shadow: 0 6px 24px rgba(232,82,106,0.32);
+  }
+  .btn-forgive:hover {
+    background: #d43c56;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(232,82,106,0.42);
+  }
+  .btn-forgive:active { transform: scale(0.97); }
+
+  /* ── Let's Talk section ── */
+  .talk-section {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--rose-light);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease 1.9s, transform 0.5s ease 1.9s;
+  }
+  .letter.visible .talk-section {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .talk-label {
+    font-size: 12px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .talk-plea {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+  .talk-plea em { color: var(--rose); font-style: normal; }
+  .btn-call {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 36px;
+    background: #fff;
+    color: var(--rose);
+    border: 1.5px solid var(--rose);
+    border-radius: 40px;
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.25s, color 0.25s, transform 0.2s, box-shadow 0.25s;
+    box-shadow: 0 4px 18px rgba(232,82,106,0.15);
+    animation: pulse-ring 2.4s ease-in-out infinite;
+  }
+  .btn-call:hover {
+    background: var(--rose);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(232,82,106,0.35);
+  }
+  .btn-call:active { transform: scale(0.97); }
+  .call-icon {
+    display: inline-block;
+    animation: ring-shake 2.4s ease-in-out infinite;
+    font-size: 17px;
+  }
+  @keyframes ring-shake {
+    0%,100% { transform: rotate(0deg); }
+    10%      { transform: rotate(-18deg); }
+    20%      { transform: rotate(18deg); }
+    30%      { transform: rotate(-14deg); }
+    40%      { transform: rotate(14deg); }
+    50%      { transform: rotate(0deg); }
+  }
+  @keyframes pulse-ring {
+    0%,100% { box-shadow: 0 4px 18px rgba(232,82,106,0.15); }
+    50%     { box-shadow: 0 4px 28px rgba(232,82,106,0.38); }
+  }
+  .waiting-line {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-style: italic;
+    animation: blink-wait 2.8s ease-in-out infinite;
+  }
+  @keyframes blink-wait {
+    0%,100% { opacity: 0.6; }
+    50%     { opacity: 1; }
+  }
+
+  /* ── Reply message ── */
+  #reply {
+    margin-top: 18px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: #28a06b;
+    min-height: 24px;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.5s, transform 0.5s;
+  }
+  #reply.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* ── Hearts burst ── */
+  .burst {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .burst-heart {
+    position: absolute;
+    font-size: 22px;
+    animation: burstfly 1.2s ease-out forwards;
+    opacity: 1;
+  }
+  @keyframes burstfly {
+    0%   { transform: translate(0,0) scale(0.5); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity: 0; }
+  }
+
+  /* ── Floating hearts bg ── */
+  .hearts-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .hrt {
+    position: absolute;
+    bottom: -40px;
+    opacity: 0;
+    font-size: 18px;
+    animation: riseheart linear infinite;
+  }
+  @keyframes riseheart {
+    0%   { transform: translateY(0) scale(1);   opacity: 0; }
+    15%  { opacity: 0.4; }
+    85%  { opacity: 0.25; }
+    100% { transform: translateY(-110vh) scale(0.7); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating petals -->
+<div class="petals" id="petals"></div>
+<!-- Floating hearts bg -->
+<div class="hearts-bg" id="heartsbg"></div>
+
+<div class="scene">
+  <!-- Envelope -->
+  <div class="envelope" id="env" onclick="openLetter()" title="Click to open">
+    <div class="env-body">
+      <div class="env-flap"></div>
+      <div class="env-left"></div>
+      <div class="env-right"></div>
+      <span class="env-hint">✉ tap to open</span>
+    </div>
+  </div>
+
+  <!-- Letter -->
+  <div class="letter" id="letter">
+    <div class="letter-date" id="ldate"></div>
+
+    <div class="letter-title">I'm truly sorry,<br>Mithi.</div>
+    <div class="letter-subtitle">— from the bottom of my heart</div>
+    <div class="divider"></div>
+
+    <div class="letter-body">
+      <p>There are moments in life when words feel too small, and this is one of them. What happened between us has weighed on me every single day, and <em>I am sorry</em> — not because I have to say it, but because I genuinely mean it.</p>
+      <p>You matter to me more than I have ever been able to express properly. Your laughter, your patience, the way you care about everything — these are things I never want to lose from my life.</p>
+      <p>I made a mistake. I hurt someone who deserved nothing but kindness from me, and that is something I carry with real regret. <em>I want to be better</em> — for you, and because of you.</p>
+      <p>If you find it in your heart to forgive me, I promise to listen more, to think before I speak, and to never take your trust for granted again. You deserve someone who shows up fully — and I want to be that person.</p>
+    </div>
+
+    <div class="from-line">
+      with love,
+      <strong>Subhu 💌</strong>
+    </div>
+
+    <div class="forgive-wrap">
+      <button class="btn-forgive" id="forgiveBtn" onclick="forgive()">Forgive Me ❤️</button>
+      <div id="reply"></div>
+    </div>
+
+    <div class="talk-section">
+      <div class="talk-label">please</div>
+      <div class="talk-plea">
+        Let's talk and sort this out, my love.<br>
+        <em>Call me as soon as you see this.</em><br>
+        I'm right here, waiting for you. 🥺
+      </div>
+      <a class="btn-call" href="tel:7978441750">
+        <span class="call-icon">📞</span>
+        Call Me Now
+      </a>
+      <div class="waiting-line">💗 waiting for your call…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Date ── */
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const d = new Date();
+document.getElementById("ldate").textContent =
+  `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+
+/* ── Petals ── */
+const petalColors = ["#f7b8c2","#f9d0d8","#fde8ec","#e8526a88","#ffc0cb"];
+const petalContainer = document.getElementById("petals");
+for (let i = 0; i < 18; i++) {
+  const p = document.createElement("div");
+  p.className = "petal";
+  const size = 12 + Math.random() * 16;
+  const color = petalColors[Math.floor(Math.random() * petalColors.length)];
+  p.style.cssText = `left:${Math.random()*100}%;animation-duration:${8+Math.random()*10}s;animation-delay:${Math.random()*12}s;`;
+  p.innerHTML = `<svg width="${size}" height="${size*1.3}" viewBox="0 0 20 26"><ellipse cx="10" cy="13" rx="8" ry="12" fill="${color}" transform="rotate(${Math.random()*30-15} 10 13)"/></svg>`;
+  petalContainer.appendChild(p);
+}
+
+/* ── Floating hearts ── */
+const hbg = document.getElementById("heartsng") || document.getElementById("heartsbe") || document.getElementById("heartsbc") || document.getElementById("heartsbd") || document.getElementById("heartsbb") || document.getElementById("heartsba") || document.getElementById("heartsb9") || document.getElementById("heartsb8") || document.getElementById("heartsb7") || document.getElementById("heartsb6") || document.getElementById("heartsb5") || document.getElementById("heartsb4") || document.getElementById("heartsb3") || document.getElementById("heartsb2") || document.getElementById("heartsb1") || document.getElementById("heartsb0") || document.getElementById("heartsbe") || document.getElementById("heartsback") || document.getElementById("heartsback2") || document.getElementById("heartsback3") || document.getElementById("heartsback4") || document.querySelector(".hearts-bg");
+for (let i = 0; i < 12; i++) {
+  const h = document.createElement("div");
+  h.className = "hrt";
+  h.textContent = ["💕","♥","💗","💖","❤️"][Math.floor(Math.random()*5)];
+  h.style.cssText = `left:${Math.random()*100}%;font-size:${10+Math.random()*14}px;animation-duration:${10+Math.random()*14}s;animation-delay:${Math.random()*14}s;`;
+  hbg.appendChild(h);
+}
+
+/* ── Open letter ── */
+let opened = false;
+function openLetter() {
+  if (opened) return;
+  opened = true;
+  document.getElementById("env").classList.add("opened");
+  document.querySelector(".env-hint").style.opacity = "0";
+  setTimeout(() => {
+    document.getElementById("letter").classList.add("visible");
+  }, 450);
+}
+
+/* ── Forgive ── */
+function forgive() {
+  const btn = document.getElementById("forgiveBtn");
+  btn.disabled = true;
+  btn.style.opacity = "0.6";
+  btn.style.cursor = "default";
+
+  const reply = document.getElementById("reply");
+  reply.textContent = "Thank you, Mithi 🌸 I'll never forget this.";
+  reply.classList.add("show");
+
+  burstHearts(btn);
+
+  /* confetti-like petals from top */
+  for (let i = 0; i < 10; i++) {
+    setTimeout(() => {
+      const p = document.createElement("div");
+      p.className = "petal";
+      const size = 10 + Math.random() * 14;
+      const color = petalColors[Math.floor(Math.random() * petalColors.length)];
+      p.style.cssText = `left:${10+Math.random()*80}%;animation-duration:${4+Math.random()*4}s;animation-delay:0s;`;
+      p.innerHTML = `<svg width="${size}" height="${size*1.3}" viewBox="0 0 20 26"><ellipse cx="10" cy="13" rx="8" ry="12" fill="${color}" transform="rotate(${Math.random()*30-15} 10 13)"/></svg>`;
+      petalContainer.appendChild(p);
+      setTimeout(() => p.remove(), 8000);
+    }, i * 160);
+  }
+}
+
+function burstHearts(btn) {
+  const rect = btn.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const container = document.createElement("div");
+  container.className = "burst";
+  container.style.left = cx + "px";
+  container.style.top = cy + "px";
+  document.body.appendChild(container);
+  const emojis = ["❤️","💖","💗","💕","🌸","💞"];
+  for (let i = 0; i < 14; i++) {
+    const h = document.createElement("div");
+    h.className = "burst-heart";
+    h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    const angle = (Math.PI * 2 / 14) * i;
+    const dist = 60 + Math.random() * 60;
+    h.style.setProperty("--dx", `${Math.cos(angle)*dist}px`);
+    h.style.setProperty("--dy", `${Math.sin(angle)*dist}px`);
+    h.style.animationDelay = Math.random() * 0.2 + "s";
+    container.appendChild(h);
+  }
+  setTimeout(() => container.remove(), 1800);
+}
+</script>
+</body>
+</html>
